@@ -1,62 +1,48 @@
-import React, { useEffect, useState } from "react";
-
+import { useState } from "react";
 import "./App.css";
 import Navbar, {
   Favourites,
   FindCharacters,
   Search,
 } from "./components/Navbar";
-import CharcterList from "./components/CharcterList";
+import CharacterList from "./components/CharacterList";
 import CharacterDetail from "./components/CharacterDetail";
-import { Toaster } from "react-hot-toast";
-import Modal from "./components/Modal";
+import toast, { Toaster } from "react-hot-toast";
 import useCharacters from "./hooks/useCharacters";
-import useLocalStorag from "./hooks/useLocalStorag";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 const App = () => {
   const [query, setQuery] = useState("");
-  const {isLoading, characters } = useCharacters('https://rickandmortyapi.com/api/character/?name',query);
+  const { isLoading, characters } = useCharacters(
+    "https://rickandmortyapi.com/api/character/?name",
+    query
+  );
   const [selectId, setSelectId] = useState(null);
-  const [favourites, setFavourites] = useLocalStorag("FAVOURITE",[])
-  // const [favourites, setFavourites] = useState(
-  //   JSON.parse(localStorage.getItem("FAVOURITE")) || []
-  // );
-  // useEffect(() => {
-  //   localStorage.setItem("FAVOURITE", JSON.stringify(favourites));
-  // }, [favourites]);
-  // useEffect(() => {
-  //     async function fetchData() {
-  //       try {
-  //         setIsLoading(true);
-  //         const res = await fetch("https://rickandmortyapi.com/api/character");
-  //         console.log(res);
-  //         if(!res.ok) throw new Error("Somthing Wrong!!");
-  //         const data = await res.json();
-  //         setCharacters(data.results.slice(0, 4));
-  //       }catch (err) {
-  //         console.log(err.message)
-  //         toast.error(err.message)
-  //       }finally{
-  //         setIsLoading(false)
-  //       }
-  //     }
-  //     fetchData();
+  const [favourites, setFavourites] = useLocalStorage("FAVOURITE", []);
 
-  // }, []);
   const selectIdHandler = (id) => {
-    setSelectId((prevId) => (prevId == id ? null : id));
-  };
-  const addFavouriteHandler = (char) => {
-    setFavourites((prevFav) => [...prevFav, char]);
-  };
-  const deleteFavouriteHandler = (id) => {
-    setFavourites((prevFav) => prevFav.filter((fav) => fav.id != id));
+    setSelectId((prevId) => (prevId === id ? null : id));
   };
 
-  const isAddToFavourute = favourites.map((fav) => fav.id).includes(selectId);
+  const addFavouriteHandler = (char) => {
+    setFavourites((prevFav) => {
+      if (prevFav.some((fav) => fav.id === char.id)) {
+        return prevFav;
+      }
+      return [...prevFav, char];
+    });
+    toast.success(`${char.name} added to favourites!`);
+  };
+
+  const deleteFavouriteHandler = (id) => {
+    setFavourites((prevFav) => prevFav.filter((fav) => fav.id !== id));
+    toast.success("Removed from favourites");
+  };
+
+  const isFavourite = favourites.some((fav) => fav.id === selectId);
+
   return (
     <div className="app">
-      {/* <Modal open={true} title="head">sdetails</Modal> */}
       <Navbar>
         <Search query={query} setQuery={setQuery} />
         <FindCharacters numOfCharacters={characters.length} />
@@ -65,8 +51,9 @@ const App = () => {
           onDeleteFavourite={deleteFavouriteHandler}
         />
       </Navbar>
-      <div className="main">
-        <CharcterList
+
+      <main className="main">
+        <CharacterList
           characters={characters}
           selectId={selectId}
           isLoading={isLoading}
@@ -75,10 +62,21 @@ const App = () => {
         <CharacterDetail
           selectId={selectId}
           onAddFavourite={addFavouriteHandler}
-          isAddToFavourute={isAddToFavourute}
+          isFavourite={isFavourite}
+          onClose={() => setSelectId(null)}
         />
-        <Toaster />
-      </div>
+      </main>
+
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "#1e293b",
+            color: "#f8fafc",
+            border: "1px solid #334155",
+          },
+        }}
+      />
     </div>
   );
 };
