@@ -25,7 +25,7 @@ A modern, responsive web application built with React and Vite to search, explor
 ### Prerequisites
 
 - Node.js (v18 or higher recommended)
-- npm or yarn
+- pnpm (v9 or higher)
 
 ### Installation
 
@@ -37,26 +37,26 @@ git clone https://github.com/Josheqani/rick-and-morty.git
 cd rick-and-morty
 
 # Install dependencies
-npm install
+pnpm install
 ```
 
 ### Development
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### Production Build
 
 ```bash
 # Lint the codebase
-npm run lint
+pnpm lint
 
 # Build for production
-npm run build
+pnpm build
 
 # Preview production build locally
-npm run preview
+pnpm preview
 ```
 
 ## 📄 License
